@@ -41,7 +41,7 @@
         .container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 5px;
         }
 
         .main-items {
@@ -97,10 +97,9 @@
             position: relative;
             background: rgba(30, 30, 30, 0.9);
             border: 1px solid #444;
-            padding: 10px;
+            padding: 4px;
             border-radius: 6px;
             backdrop-filter: blur(3px);
-
         }
 
         .image-block.dragging {
@@ -1030,11 +1029,11 @@
         const container = document.getElementById('container');
 
         container.addEventListener('mousedown', e => {
-            document.body.style.overflow = 'hidden'; // desabilita scroll da página
+            document.body.style.overflow = 'hidden';
         });
 
         container.addEventListener('mouseup', e => {
-            document.body.style.overflow = 'auto'; // reativa scroll da página
+            document.body.style.overflow = 'auto';
         });
 
         function toggleMainItems(button) {
@@ -1042,7 +1041,7 @@
             const imagesDiv = parent.querySelector(".images");
             if (imagesDiv.style.display === "none") {
                 imagesDiv.style.display = "flex";
-                button.style.backgroundColor = "green"; // ícone para mostrar que está visível
+                button.style.backgroundColor = "green";
             } else {
                 imagesDiv.style.display = "none";
                 button.style.backgroundColor = "orange";
@@ -1204,7 +1203,7 @@
         function loadFromHash(hash) {
             const blocks = JSON.parse(decodeURIComponent(escape(atob(hash))));
             const container = document.getElementById("container");
-            container.innerHTML = ""; // limpa os blocos atuais
+            container.innerHTML = "";
 
             blocks.forEach(blockData => {
                 const block = document.createElement("div");
@@ -1228,7 +1227,7 @@
                     imagesDiv.appendChild(img);
                 });
 
-                // Aplica cor de fundo do bloco
+         
                 const order = Object.keys(colors);
                 const colorKey = order[blockData.color];
                 block.style.background = colors[colorKey];
@@ -1346,14 +1345,12 @@
         function refreshBlockDrag() { enableBlockDragAndDrop(); }
         function refreshImageDrag() { enableImageDragAndDrop(); }
 
-
-
         window.addEventListener("load", () => {
             const params = new URLSearchParams(window.location.search);
             const build = params.get("build");
             if (!build) return;
             try {
-                const fixedHash = build.replace(/ /g, '+'); // corrige espaços que viraram +
+                const fixedHash = build.replace(/ /g, '+'); 
                 document.getElementById("hashInput").value = fixedHash;
                 loadFromHash(fixedHash);
                 refreshAllDrag();

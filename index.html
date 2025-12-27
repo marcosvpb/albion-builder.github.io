@@ -41,7 +41,7 @@
         .container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 5px;
         }
 
         .main-items {
@@ -97,10 +97,9 @@
             position: relative;
             background: rgba(30, 30, 30, 0.9);
             border: 1px solid #444;
-            padding: 10px;
+            padding: 4px;
             border-radius: 6px;
             backdrop-filter: blur(3px);
-
         }
 
         .image-block.dragging {
@@ -1345,8 +1344,6 @@
 
         function refreshBlockDrag() { enableBlockDragAndDrop(); }
         function refreshImageDrag() { enableImageDragAndDrop(); }
-
-
 
         window.addEventListener("load", () => {
             const params = new URLSearchParams(window.location.search);
