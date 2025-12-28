@@ -46,11 +46,12 @@
 
         .main-items {
             display: grid;
-            gap: 15px;
+            gap: 4px;
         }
 
         .scroll-box {
-            max-height: 12vh;
+            min-height: 6vh;
+            max-height: 20vh;
             overflow-y: auto;
             border: 3px solid #ffae00;
             border-radius: 5px;
@@ -61,8 +62,8 @@
         }
 
         .scroll-box-item {
-            max-height: 90vh;
-            overflow-y: auto;
+            max-height: 70vh;
+            overflow: auto;
             border: 3px solid #ffae00;
             border-radius: 5px;
             padding: 10px;
@@ -113,7 +114,9 @@
         .images {
             display: flex;
             flex-wrap: wrap;
-            gap: 4px;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
             border: 1px dashed rgba(255, 255, 255, 0.3);
             padding: 2px;
             min-height: 56px;
@@ -153,6 +156,19 @@
             border-radius: 4px;
             margin-bottom: 5px;
             margin-top: 5px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 14px;
+            background: #111;
+            color: #ccc;
+            border-top: 1px solid #333;
         }
 
         .btn-color {
@@ -195,6 +211,10 @@
         }
 
         .hide-ui .scroll-box {
+            display: none !important;
+        }
+
+        .hide-ui input {
             display: none !important;
         }
 
@@ -244,6 +264,7 @@
     <input type="hidden" id="hashInput" style="width:100%; padding:8px; border-radius:4px; border:none;" />
     <input type="text" id="filterInput" placeholder="Filtrar (ex: arcano)"
         style="height: 24px; width: 500px; margin-left: 10px;" oninput="filterBlocks(this.value)" autocomplete="off" />
+
 
 
     <!-- Items -->
@@ -989,6 +1010,9 @@
         </div>
     </div>
 
+    <footer class="footer">
+        Criado por <strong>Marcos Barbosa</strong>
+    </footer>
 
     <script>
 
@@ -999,6 +1023,8 @@
             <div style="text-align:left; font-size:14px">
                 <b>Numpad +</b> → Aumenta o Tier<br>
                 <b>Numpad −</b> → Diminui o Tier<br>
+                <b>,</b> → Diminui o Encantamento<br>
+                <b>.</b> → Aumenta o Encantamento<br>
                 <b>B</b> → Coloca/Remove MasterPiece no Item<br><br>
                 <b>MouseHover</b> em uma imagem para editar<br>
                 Alterações são salvas automaticamente
@@ -1027,34 +1053,42 @@
 
 
         document.addEventListener("keydown", e => {
-            if (!hoveredImg) return;
-            if (e.repeat) return;
+            if (!hoveredImg || e.repeat) return;
 
             let src = hoveredImg.src;
 
-            const match = src.match(/T([4-8])_/);
-            if (!match) return;
+            const tierMatch = src.match(/T([4-8])_/);
+            if (!tierMatch) return;
 
-            let tier = parseInt(match[1], 10);
+            let tier = parseInt(tierMatch[1], 10);
 
             const qualityMatch = src.match(/quality=(\d+)/);
             let quality = qualityMatch ? parseInt(qualityMatch[1], 10) : 1;
 
-            if (e.code === "NumpadAdd") { $.notify("Alterado Tier!", "warn"); tier++; }
-            if (e.code === "NumpadSubtract") { $.notify("Alterado Tier!", "warn"); tier--; }
-            if (e.code === "KeyB") {
-                console.log(quality);
-                $.notify("Alterado Enchant!", "warn");
-                quality = (quality === 1) ? 5 : 1;
-            }
+            const atMatch = src.match(/@(\d+)\.png/);
+            let atLevel = atMatch ? parseInt(atMatch[1], 10) : 0;
 
+            if (e.code === "NumpadAdd") tier++;
+            if (e.code === "NumpadSubtract") tier--;
+
+            if (e.code === "Comma") atLevel--;
+            if (e.code === "Period") atLevel++;
+
+            if (e.code === "KeyB") quality = (quality === 1) ? 5 : 1;
 
             tier = Math.min(8, Math.max(4, tier));
+            atLevel = Math.max(0, Math.min(4, atLevel));
 
-            const newSrc = src.replace(/T[4-8]_/, `T${tier}_`).replace(/quality=\d+/, `quality=${quality}`);
+            let newSrc = src
+                .replace(/@(\d+)?\.png/, ".png")
+                .replace(/\.png/, atLevel > 0 ? `@${atLevel}.png` : ".png")
+                .replace(/T[4-8]_/, `T${tier}_`)
+                .replace(/quality=\d+/, `quality=${quality}`);
+
             hoveredImg.src = newSrc;
             saveToHash();
         });
+
 
 
 
