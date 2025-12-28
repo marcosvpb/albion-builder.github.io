@@ -10,9 +10,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <link rel="icon" type="image/png" href="https://iili.io/fVRrpxp.md.png">
 
-
+    <!-- CSS -->
     <style>
         html,
         body {
@@ -22,6 +23,24 @@
             background:
                 linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
                 url("https://assets.albiononline.com/uploads/media/default/media/03f4ae95f6a2ad7ced5ea3386e70dd403b3a4276.jpeg") center / cover no-repeat fixed;
+        }
+
+        .name-wrapper {
+            width: 100%;
+            min-height: 32px;
+            display: flex;
+            box-shadow: 0 4px 12px rgba(25, 25, 25, .7);
+            border-top-right-radius: 4px;
+            border-top-left-radius: 4px;
+            background-color: rgba(0, 0, 0, .45);
+            justify-content: center;
+        }
+
+        .image-block .block-name {
+            width: 220px;
+            max-width: 90%;
+            text-align: center;
+            font-weight: bold;
         }
 
         .image-container {
@@ -42,6 +61,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 5px;
+            box-shadow: 0 4px 12px rgba(25, 25, 25, .7);
         }
 
         .main-items {
@@ -53,23 +73,22 @@
             min-height: 6vh;
             max-height: 20vh;
             overflow-y: auto;
-            border: 3px solid #ffae00;
-            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
             padding: 10px;
             margin-bottom: 10px;
-            border: 1px solid #ccc;
             padding: 10px;
         }
 
         .scroll-box-item {
             max-height: 90vh;
             overflow: auto;
-            border: 3px solid #ffae00;
+            box-shadow: 1px 4px 12px rgba(25, 25, 25, 1);
             border-radius: 5px;
             padding: 10px;
             margin-bottom: 10px;
-            border: 1px solid #ccc;
             padding: 5px;
+            background-color: rgba(0, 0, 0, .45);
+
         }
 
 
@@ -95,6 +114,8 @@
         }
 
         .image-block {
+            align-items: center;
+            justify-content: center;
             position: relative;
             background: rgba(30, 30, 30, 0.9);
             border: 1px solid #444;
@@ -180,7 +201,16 @@
             border-radius: 4px;
             margin-bottom: 5px;
             margin-top: 5px;
+        }
 
+        .block-name {
+            margin: 8px 0;
+            padding: 4px 10px;
+            width: 80%;
+            max-width: 220px;
+            text-align: center;
+            border-radius: 6px;
+            border: 1px solid #999;
         }
 
         .remove-block {
@@ -242,6 +272,36 @@
         #helpBtn:hover {
             background: #3a3f4a;
         }
+
+        #players-pool {
+            padding: 2px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
+        }
+
+        .player-btn {
+            padding: 4px 10px;
+            width: 80%;
+            cursor: grab;
+            max-width: 220px;
+            gap: 20px;
+            text-align: center;
+            border-radius: 6px;
+            border: 1px solid #999;
+            font-weight: bold;
+            margin: 4px;
+        }
+
+        .player-btn .dragging {
+            opacity: 0.5;
+        }
+
+        .image-block {
+            min-height: 60px;
+        }
     </style>
 </head>
 
@@ -259,6 +319,9 @@
 
     <button class="btn-main btn-toggle" onclick="addBlock()"> Adicionar Build</button>
     <button class="btn-main btn-toggle" onclick="copyBuildUrl()">Copiar link da build</button>
+
+
+
 
     <button class="btn-main btn-toggle" id="helpBtn" title="Ajuda">?</button>
     <input type="hidden" id="hashInput" style="width:100%; padding:8px; border-radius:4px; border:none;" />
@@ -1000,6 +1063,18 @@
 
     </div>
 
+    <div class="name-wrapper">
+        <textarea id="player_lists"
+            style="height: 24px; width: 500px; margin-left: 10px; align-self: center; margin-right: 4px;"
+            placeholder="Um nome por linha" rows="5"></textarea>
+
+        <button class="btn-main btn-toggle" onclick="generatePlayerButtons()">Gerar Players</button>
+    </div>
+
+    <div id="players-pool">
+
+    </div>
+
     <!-- <div style="margin:15px 0;">
         
         <button class="btn-main" onclick="loadFromTextbox()">📥 Carregar build</button>
@@ -1011,10 +1086,96 @@
     </div>
 
     <footer class="footer">
-        Criado por <strong>Marcos Barbosa</strong>
+        Criado por <strong>Marcos Barbosa </strong>
     </footer>
 
     <script>
+        let draggedPlayer = null;
+
+        function generatePlayerButtons() {
+            document.querySelectorAll(".player-btn").forEach(btn => btn.remove());
+            const text = document.getElementById("player_lists").value;
+            const pool = document.getElementById("players-pool");
+            pool.innerHTML = "";
+
+            text.split("\n")
+                .map(n => n.trim())
+                .filter(Boolean)
+                .forEach(name => {
+                    const btn = document.createElement("button");
+                    btn.className = "player-btn btn-toggle";
+                    btn.textContent = name;
+                    btn.draggable = true;
+
+                    btn.addEventListener("dragstart", () => {
+                        draggedPlayer = btn;
+                        btn.classList.add("dragging");
+                    });
+
+                    btn.addEventListener("dragend", () => {
+                        draggedPlayer = null;
+                        btn.classList.remove("dragging");
+                    });
+
+                    pool.appendChild(btn);
+                });
+        }
+
+        document.addEventListener("dragover", e => {
+            if (e.target.closest(".name-wrapper")) {
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener("drop", e => {
+            const wrapper = e.target.closest(".name-wrapper");
+            if (!wrapper || !draggedPlayer) return;
+
+            e.preventDefault();
+
+            const pool = document.getElementById("players-pool");
+
+            const existing = wrapper.querySelector(".player-btn");
+            if (existing) {
+                resetPlayerButton(existing);
+                pool.appendChild(existing);
+            }
+
+            placePlayerInBlock(draggedPlayer, wrapper);
+            saveToHash();
+        });
+
+        function placePlayerInBlock(btn, wrapper) {
+            const pool = document.getElementById("players-pool");
+
+            btn.classList.add("in-block");
+            btn.draggable = false;
+
+            btn.onclick = () => {
+                resetPlayerButton(btn);
+                pool.appendChild(btn);
+                saveToHash();
+            };
+
+            wrapper.appendChild(btn);
+        }
+
+        function resetPlayerButton(btn) {
+            btn.classList.remove("in-block");
+            btn.draggable = true;
+            btn.onclick = null;
+
+            btn.addEventListener("dragstart", () => {
+                draggedPlayer = btn;
+                btn.classList.add("dragging");
+            });
+
+            btn.addEventListener("dragend", () => {
+                draggedPlayer = null;
+                btn.classList.remove("dragging");
+            });
+        }
+
 
         document.getElementById("helpBtn").addEventListener("click", () => {
             Swal.fire({
@@ -1027,7 +1188,11 @@
                 <b>.</b> → Aumenta o Encantamento<br>
                 <b>B</b> → Coloca/Remove MasterPiece no Item<br><br>
                 <b>MouseHover</b> em uma imagem para editar<br>
-                Alterações são salvas automaticamente
+          
+
+                Dentro do bloco <b>textarea</b> você pode criar botões para determinar o nome do jogador que usará a build.
+
+                <i>Alterações são salvas automaticamente</i>
             </div>
         `,
                 icon: "info",
@@ -1237,8 +1402,12 @@
             block.className = "image-block";
             block.dataset.color = 0;
             block.innerHTML = `
+
                 <button class="remove-block" title="Excluir Build" onclick="this.parentElement.remove(); saveToHash()">✖</button>
                 <button class="btn-color" onclick="toggleColor(this); saveToHash()">🛡️ Classe</button>
+                       <div class="name-wrapper">
+                
+</div>
                 <div class="images"></div>
             `;
             document.getElementById("container").appendChild(block);
@@ -1290,10 +1459,12 @@
                 const block = document.createElement("div");
                 block.className = "image-block";
                 block.dataset.color = blockData.color || 0;
-
                 block.innerHTML = `
             <button class="remove-block" title="Excluir Build" onclick="this.parentElement.remove(); saveToHash()">✖</button>
             <button class="btn-color" onclick="toggleColor(this); saveToHash()">${classes[blockData.color]}</button>
+<div class="name-wrapper">
+
+</div>
             <div class="images"></div>
         `;
 
