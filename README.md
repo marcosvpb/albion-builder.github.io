@@ -62,7 +62,7 @@
         }
 
         .scroll-box-item {
-            max-height: 70vh;
+            max-height: 90vh;
             overflow: auto;
             border: 3px solid #ffae00;
             border-radius: 5px;
