@@ -346,7 +346,7 @@
                     draggable="true">
                 <img src="https://render.albiononline.com/v1/item/T8_HEAD_LEATHER_SET2.png?count=1&amp;quality=1"
                     draggable="true">
-                <img src="https://render.albiononline.com/v1/item/T8_HEAD_LEATHER_UNDEAD.png?count=1&amp;quality=1"
+                <img src="https://render.albiononline.com/v1/item/T8_HEAD_LEATHER_MORGANA.png?count=1&amp;quality=1"
                     draggable="true">
                 <img src="https://render.albiononline.com/v1/item/T8_HEAD_LEATHER_FEY.png?count=1&amp;quality=1"
                     draggable="true">
