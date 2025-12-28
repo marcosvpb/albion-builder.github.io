@@ -775,6 +775,30 @@
             </div>
         </div>
 
+
+        <!-- Lancas -->
+        <div class="main-items" style="position: relative;" data-category="lancas">
+
+            <div class="images">
+                <img src="https://render.albiononline.com/v1/item/T8_MAIN_SPEAR_LANCE_AVALON.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_MAIN_SPEAR_KEEPER.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_SPEAR.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_MAIN_SPEAR.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_TRIDENT_UNDEAD.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_GLAIVE.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_HARPOON_HELL.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_GLAIVE_CRYSTAL.png?count=1&amp;quality=1"
+                    draggable="true">
+            </div>
+        </div>
+
         <!-- Bestas -->
         <div class="main-items" style="position: relative;" data-category="bestas">
 
@@ -794,6 +818,29 @@
                 <img src="https://render.albiononline.com/v1/item/T8_2H_DUALCROSSBOW_CRYSTAL.png?count=1&amp;quality=1"
                     draggable="true">
                 <img src="https://render.albiononline.com/v1/item/T8_MAIN_1HCROSSBOW.png?count=1&amp;quality=1"
+                    draggable="true">
+            </div>
+        </div>
+
+        <!-- Bordoes -->
+        <div class="main-items" style="position: relative;" data-category="bordoes">
+
+            <div class="images">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_QUARTERSTAFF_AVALON.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_QUARTERSTAFF.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_TWINSCYTHE_HELL.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_ROCKSTAFF_KEEPER.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_IRONCLADEDSTAFF.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_DOUBLEBLADEDSTAFF_CRYSTAL.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_DOUBLEBLADEDSTAFF.png?count=1&amp;quality=1"
+                    draggable="true">
+                <img src="https://render.albiononline.com/v1/item/T8_2H_COMBATSTAFF_MORGANA.png?count=1&amp;quality=1"
                     draggable="true">
             </div>
         </div>
@@ -1227,7 +1274,7 @@
                     imagesDiv.appendChild(img);
                 });
 
-         
+
                 const order = Object.keys(colors);
                 const colorKey = order[blockData.color];
                 block.style.background = colors[colorKey];
@@ -1350,7 +1397,7 @@
             const build = params.get("build");
             if (!build) return;
             try {
-                const fixedHash = build.replace(/ /g, '+'); 
+                const fixedHash = build.replace(/ /g, '+');
                 document.getElementById("hashInput").value = fixedHash;
                 loadFromHash(fixedHash);
                 refreshAllDrag();
