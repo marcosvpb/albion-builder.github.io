@@ -1148,7 +1148,7 @@
                 .forEach(name => {
                     const btn = document.createElement("button");
                     btn.className = "player-btn btn-toggle";
-                    btn.textContent = name;
+                    btn.textContent = name.replace(/[^A-Za-z0-9]/g, "");
 
                     if (name.includes("$")) {
                         btn.textContent = "👑" + name;
@@ -1606,15 +1606,27 @@
         function blockDragEnd(e) { e.currentTarget.classList.remove("dragging"); draggedBlock = null; saveToHash(); }
         function blockDragOver(e) { e.preventDefault(); e.currentTarget.classList.add("drag-over"); }
         function blockDragLeave(e) { e.currentTarget.classList.remove("drag-over"); }
+
         function blockDrop(e) {
-            e.preventDefault(); e.currentTarget.classList.remove("drag-over");
-            if (!draggedBlock || draggedBlock === e.currentTarget) return;
+            e.preventDefault();
+            e.currentTarget.classList.remove("drag-over");
+
+            const targetBlock = e.currentTarget;
+
+            if (!draggedBlock || draggedBlock === targetBlock) return;
+
             const container = document.getElementById("container");
-            const blocks = [...container.querySelectorAll(".image-block")];
-            const draggedIndex = blocks.indexOf(draggedBlock);
-            const targetIndex = blocks.indexOf(e.currentTarget);
-            if (draggedIndex < targetIndex) { container.insertBefore(draggedBlock, e.currentTarget.nextSibling); }
-            else { container.insertBefore(draggedBlock, e.currentTarget); }
+
+            const temp = document.createElement("div");
+
+            const draggedNext = draggedBlock.nextSibling === targetBlock
+                ? draggedBlock
+                : draggedBlock.nextSibling;
+
+            container.insertBefore(temp, targetBlock);
+            container.insertBefore(targetBlock, draggedBlock);
+            container.insertBefore(draggedBlock, temp);
+            temp.remove();
             saveToHash();
         }
 
