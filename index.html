@@ -17,6 +17,7 @@
     <style>
         html,
         body {
+            padding-bottom: 40px;
             height: 100%;
             font-family: 'Ubuntu', sans-serif;
             color: white;
@@ -69,6 +70,10 @@
             gap: 4px;
         }
 
+        .hide-ui .scroll-box-item {
+            max-height: 90vh;
+        }
+
         .scroll-box {
             min-height: 6vh;
             max-height: 20vh;
@@ -76,11 +81,9 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
             padding: 10px;
             margin-bottom: 10px;
-            padding: 10px;
         }
 
         .scroll-box-item {
-            max-height: 90vh;
             overflow: auto;
             box-shadow: 1px 4px 12px rgba(25, 25, 25, 1);
             border-radius: 5px;
@@ -88,7 +91,7 @@
             margin-bottom: 10px;
             padding: 5px;
             background-color: rgba(0, 0, 0, .45);
-
+            max-height: 70vh;
         }
 
 
@@ -96,7 +99,7 @@
             display: block;
             margin-bottom: 5px;
             max-width: 100%;
-            user-select: none;
+
         }
 
 
@@ -132,7 +135,33 @@
             outline: 2px dashed #2ecc71;
         }
 
+        .btn-pulse {
+            padding: 12px 28px;
+            background: #ffaa00;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 0 40px rgba(255, 123, 0, 0.7);
+            animation: pulseLight .8s infinite;
+        }
+
+        @keyframes pulseLight {
+            0% {
+                box-shadow: 0 0 5px rgba(175, 147, 76, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(175, 137, 76, 0.9);
+            }
+
+            100% {
+                box-shadow: 0 0 5px rgba(175, 145, 76, 0.4);
+            }
+        }
+
         .images {
+            position: sticky;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -184,12 +213,15 @@
             bottom: 0;
             left: 0;
             width: 100%;
+            height: 40px;
             text-align: center;
-            padding: 8px 0;
+            line-height: 40px;
             font-size: 14px;
             background: #111;
             color: #ccc;
             border-top: 1px solid #333;
+            z-index: 1000;
+            transition: transform 0.4s ease, opacity 0.4s ease;
         }
 
         .btn-color {
@@ -277,7 +309,7 @@
             padding: 2px;
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 2px;
             justify-content: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
         }
@@ -312,22 +344,32 @@
         </div> -->
 
     </h1>
-
     <!-- Botoes -->
+
+    <div class="name-wrapper">
+        <span style="display: flex; align-items: center; justify-content: center; margin: 5px;">Hash:</span>
+        <input class="btn-main btn-toggle" type="text" style="height: 12px; width: 100%; margin: 5px;" id="hashInput"
+            style="width:100%; padding:8px; border-radius:4px; border:none;" />
+    </div>
+
     <button class="btn-main btn-toggle" onclick="hideAll()">Esconder</button>
     <button class="btn-main btn-toggle" onclick="showAll()">Mostrar</button>
 
     <button class="btn-main btn-toggle" onclick="addBlock()"> Adicionar Build</button>
-    <button class="btn-main btn-toggle" onclick="copyBuildUrl()">Copiar link da build</button>
-
-
-
+    <button class="btn-main btn-toggle" onclick="copyBuildUrl()">Copiar Hash</button>
 
     <button class="btn-main btn-toggle" id="helpBtn" title="Ajuda">?</button>
-    <input type="hidden" id="hashInput" style="width:100%; padding:8px; border-radius:4px; border:none;" />
+
     <input type="text" id="filterInput" placeholder="Filtrar (ex: arcano)"
         style="height: 24px; width: 500px; margin-left: 10px;" oninput="filterBlocks(this.value)" autocomplete="off" />
 
+    <!-- Players -->
+    <div class="name-wrapper">
+        <textarea id="player_lists"
+            style="height: 24px; width: 500px; margin-left: 10px; align-self: center; margin-right: 4px;"
+            placeholder="Um nome por linha" rows="5"></textarea>
+        <button class="btn-main btn-toggle" onclick="generatePlayerButtons()">Gerar Players</button>
+    </div>
 
 
     <!-- Items -->
@@ -1063,13 +1105,6 @@
 
     </div>
 
-    <div class="name-wrapper">
-        <textarea id="player_lists"
-            style="height: 24px; width: 500px; margin-left: 10px; align-self: center; margin-right: 4px;"
-            placeholder="Um nome por linha" rows="5"></textarea>
-
-        <button class="btn-main btn-toggle" onclick="generatePlayerButtons()">Gerar Players</button>
-    </div>
 
     <div id="players-pool">
 
@@ -1085,11 +1120,20 @@
         </div>
     </div>
 
-    <footer class="footer">
+    <!-- <footer class="footer">
         Criado por <strong>Marcos Barbosa </strong>
-    </footer>
+    </footer> -->
 
     <script>
+        const hashInput = document.getElementById("hashInput");
+
+        hashInput.addEventListener("keydown", e => {
+            if (e.key === "Enter") {
+                e.preventDefault(); // evita submit / reload
+                loadFromTextbox();
+            }
+        });
+
         let draggedPlayer = null;
 
         function generatePlayerButtons() {
@@ -1105,8 +1149,14 @@
                     const btn = document.createElement("button");
                     btn.className = "player-btn btn-toggle";
                     btn.textContent = name;
-                    btn.draggable = true;
 
+                    if (name.includes("$")) {
+                        btn.textContent = "👑" + name;
+                        btn.style.background = "linear-gradient(145deg, #f1c40f, #d4ac0d)";
+                        btn.className = "player-btn btn-toggle btn-pulse";
+                    }
+
+                    btn.draggable = true;
                     btn.addEventListener("dragstart", () => {
                         draggedPlayer = btn;
                         btn.classList.add("dragging");
@@ -1187,10 +1237,9 @@
                 <b>,</b> → Diminui o Encantamento<br>
                 <b>.</b> → Aumenta o Encantamento<br>
                 <b>B</b> → Coloca/Remove MasterPiece no Item<br><br>
+               <b>$</b> → Na frente do nome identifica o caller.<br>
                 <b>MouseHover</b> em uma imagem para editar<br>
-          
-
-                Dentro do bloco <b>textarea</b> você pode criar botões para determinar o nome do jogador que usará a build.
+                Dentro do bloco <b>textarea</b> você pode criar botões para determinar o nome do jogador que usará a build.<br>
 
                 <i>Alterações são salvas automaticamente</i>
             </div>
@@ -1258,6 +1307,8 @@
 
 
 
+
+
         function filterBlocks(value) {
             const search = value.toLowerCase().trim();
 
@@ -1274,13 +1325,24 @@
 
         const container = document.getElementById('container');
 
-        container.addEventListener('mousedown', e => {
-            document.body.style.overflow = 'hidden';
-        });
+        document.addEventListener("dragover", e => {
+            const threshold = 80;
+            const speed = 15;
 
-        container.addEventListener('mouseup', e => {
-            document.body.style.overflow = 'auto';
+            if (e.clientY < threshold) {
+                window.scrollBy(0, -speed);
+            }
+            else if (window.innerHeight - e.clientY < threshold) {
+                window.scrollBy(0, speed);
+            }
         });
+        // container.addEventListener('mousedown', e => {
+        //     document.body.style.overflow = 'hidden';
+        // });
+
+        // container.addEventListener('mouseup', e => {
+        //     document.body.style.overflow = 'auto';
+        // });
 
         function toggleMainItems(button) {
             const parent = button.parentElement;
@@ -1441,8 +1503,15 @@
 
         function hideAll() { document.body.classList.add("hide-ui"); }
         function showAll() { document.body.classList.remove("hide-ui"); }
-        function copyHash() { navigator.clipboard.writeText(document.getElementById("hashInput").value); $.notify("Hash!", { className: "success" }); }
-        function copyBuildUrl() { const hash = document.getElementById("hashInput").value.trim(); if (!hash) return; navigator.clipboard.writeText(`${location.origin}${location.pathname}?build=${hash}`); $.notify("Build copiada!", "success"); }
+        function copyHash() { navigator.clipboard.writeText(document.getElementById("hashInput").value); $.notify("Hash!", { className: "success", globalPosition: "left top" }); }
+        function copyBuildUrl() {
+            const hash = document.getElementById("hashInput").value.trim();
+            if (!hash) return;
+            //navigator.clipboard.writeText(`${location.origin}${location.pathname}?build=${hash}`);
+            navigator.clipboard.writeText(`${hash}`);
+            $.notify("Hash copiado!", { className: "success", globalPosition: "left top" });
+
+        }
 
         function loadFromTextbox() {
             const input = document.getElementById("hashInput").value.trim();
