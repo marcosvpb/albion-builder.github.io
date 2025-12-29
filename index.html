@@ -9,6 +9,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="icon" type="image/png" href="https://iili.io/fVRrpxp.md.png">
@@ -1453,11 +1454,18 @@
                     src: img.src,
                     type: img.dataset.type || null
                 }));
-                blocks.push({ color: parseInt(block.dataset.color || 0), images });
+                blocks.push({
+                    color: parseInt(block.dataset.color || 0),
+                    images
+                });
             });
-            const hash = btoa(unescape(encodeURIComponent(JSON.stringify(blocks))));
-            document.getElementById("hashInput").value = hash;
+
+            const json = JSON.stringify(blocks);
+            const compressed = LZString.compressToEncodedURIComponent(json);
+
+            document.getElementById("hashInput").value = compressed;
         }
+
 
         function addBlock() {
             const block = document.createElement("div");
@@ -1520,7 +1528,10 @@
         }
 
         function loadFromHash(hash) {
-            const blocks = JSON.parse(decodeURIComponent(escape(atob(hash))));
+            const json = LZString.decompressFromEncodedURIComponent(hash);
+            if (!json) throw new Error("Invalid or corrupted hash");
+
+            const blocks = JSON.parse(json);
             const container = document.getElementById("container");
             container.innerHTML = "";
 
@@ -1528,12 +1539,15 @@
                 const block = document.createElement("div");
                 block.className = "image-block";
                 block.dataset.color = blockData.color || 0;
-                block.innerHTML = `
-            <button class="remove-block" title="Excluir Build" onclick="this.parentElement.remove(); saveToHash()">✖</button>
-            <button class="btn-color" onclick="toggleColor(this); saveToHash()">${classes[blockData.color]}</button>
-<div class="name-wrapper">
 
-</div>
+                block.innerHTML = `
+            <button class="remove-block" title="Excluir Build"
+                onclick="this.parentElement.remove(); saveToHash()">✖</button>
+            <button class="btn-color"
+                onclick="toggleColor(this); saveToHash()">
+                ${classes[blockData.color]}
+            </button>
+            <div class="name-wrapper"></div>
             <div class="images"></div>
         `;
 
@@ -1548,17 +1562,15 @@
                     imagesDiv.appendChild(img);
                 });
 
-
                 const order = Object.keys(colors);
-                const colorKey = order[blockData.color];
-                block.style.background = colors[colorKey];
+                block.style.background = colors[order[blockData.color]];
 
                 container.appendChild(block);
             });
 
             refreshAllDrag();
-            saveToHash();
         }
+
 
         function getDragAfterImage(container, x) {
             const draggableElements = [...container.querySelectorAll("img:not(.dragging)")];
